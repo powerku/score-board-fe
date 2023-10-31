@@ -6,7 +6,8 @@ interface TeamNameProps {
     name?: string;
 }
 
-const TeamName = ({ name }: TeamNameProps) => {
+
+const TeamName = ({ name = "Home" }: TeamNameProps) => {
     const [teamName, setTeamName] = useState(name);
 
     const onClick = () => {
@@ -15,11 +16,11 @@ const TeamName = ({ name }: TeamNameProps) => {
     }
 
     return (
-        <div
-            className="cursor-pointer"
+        <span
+            className="text-xl cursor-pointer"
             onClick={onClick}>
             {teamName}
-        </div>
+        </span>
     );
 };
 
