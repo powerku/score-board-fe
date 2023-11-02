@@ -7,7 +7,6 @@ import {cn} from "@/lib/utils";
 
 import {Button} from "@/components/ui/button";
 
-
 interface TimerProps {
     initialMinute?: number;
     initialSecond?: number;
@@ -44,7 +43,7 @@ const Timer = ({initialMinute = 15, initialSecond = 0, quarter, setQuarter}: Tim
             return;
         }
 
-        let interval;
+        let interval: string | number | NodeJS.Timeout | undefined;
 
         if (minuteSecondMode) {
             interval = setInterval(() => {
