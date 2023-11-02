@@ -8,6 +8,14 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      colors: {
+        primary: "hsl(var(--primary))",
+        secondary: "hsl(var(--secondary))",
+        background: "hsl(var(--background))",
+      },
+      textColor: {
+        "primary-foreground": "hsl(var(--primary-foreground))",
+      },
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
         'gradient-conic':
