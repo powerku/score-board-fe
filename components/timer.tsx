@@ -1,22 +1,29 @@
 "use client";
 
 import React, {useEffect, useMemo, useState} from 'react';
-import {cn} from "@/lib/utils";
 import localFont from "next/font/local";
+
+import {cn} from "@/lib/utils";
+
 import {Button} from "@/components/ui/button";
 
 
 interface TimerProps {
-    minute?: number;
-    second?: number;
+    initialMinute?: number;
+    initialSecond?: number;
+    quarter: number;
+    setQuarter: React.Dispatch<React.SetStateAction<number>>;
 }
 
 const digitalFont = localFont({ src: '../app/fonts/Digital_Dismay.otf' })
 
-const Timer = ({minute = 15, second = 0}: TimerProps) => {
-    const [min, setMinute] = useState(15)
-    const [sec, setSecond] = useState(0)
+const Timer = ({initialMinute = 15, initialSecond = 0, quarter, setQuarter}: TimerProps) => {
+    const [min, setMinute] = useState(initialMinute)
+    const [sec, setSecond] = useState(initialSecond)
+    const [milliSec, setMilliSec] = useState(0)
+    const [saveMin, setSaveMinute] = useState(initialMinute)
     const [isRunning, setIsRunning] = useState(false);
+    const [minuteSecondMode, setIsMinuteSecondMode] = useState(true);
 
     const formatMinute = useMemo(() => {
         return min.toString().padStart(2, '0')
@@ -26,35 +33,88 @@ const Timer = ({minute = 15, second = 0}: TimerProps) => {
         return sec.toString().padStart(2, '0')
     }, [sec])
 
+    useEffect(() => {
+        if (min === 0) {
+            setIsMinuteSecondMode(false);
+        }
+    }, [min]);
 
     useEffect(() => {
         if (!isRunning) {
             return;
         }
 
-        const interval = setInterval(() => {
-            if (sec > 0 ) {
-                setSecond(sec - 1)
-            } else if (second === 0 && minute > 0) {
-                setMinute(min - 1)
-                if (min !== 0) {
-                    setSecond(59)
+        let interval;
+
+        if (minuteSecondMode) {
+            interval = setInterval(() => {
+                if (sec > 0 ) {
+                    setSecond(sec - 1)
+                } else if (sec === 0 && min > 0) {
+                    setMinute(min - 1)
+                    if (min !== 0) {
+                        setSecond(59)
+                    }
                 }
-            }
-        }, 1000)
+            }, 1000)
+        } else {
+            interval = setInterval(() => {
+                if (milliSec > 0 ) {
+                    setMilliSec(milliSec - 1)
+                } else if (milliSec === 0 && sec > 0) {
+                    setSecond(sec - 1)
+                    if (sec !== 0) {
+                        setMilliSec(9)
+                    }
+                }
+            }, 100)
+        }
 
         return () => clearInterval(interval)
     });
 
-    const onClick = () => {
+    const go = () => {
         setIsRunning(isRunning => !isRunning);
+    }
+
+    const reset = () => {
+        setMinute(saveMin);
+        setSecond(0);
+        setMilliSec(0)
+        setIsRunning(false);
+        setIsMinuteSecondMode(true);
+    }
+
+    const onSave = () => {
+        setSaveMinute(min);
     }
 
     return (
         <>
-            <span className={cn("text-xl", digitalFont.className )}>{formatMinute}:</span>
-            <span className={cn("text-xl", digitalFont.className )}>{formatSecond}</span>
-            <Button onClick={onClick}>{isRunning ? 'Stop':'Start'}</Button>
+            <div className="text-center text-yellow-400">
+            {minuteSecondMode ? <>
+                <span className={cn("text-[25rem]", digitalFont.className )}>{formatMinute}:</span>
+                <span className={cn("text-[25rem]", digitalFont.className )}>{formatSecond}</span>
+            </>: <>
+                <span className={cn("text-[25rem]", digitalFont.className )}>{formatSecond}.</span>
+                <span className={cn("text-[25rem]", digitalFont.className )}>{milliSec}</span>
+            </>
+            }
+            </div>
+            <div className="text-center flex justify-center gap-1">
+                <Button onClick={() => setMinute(min + 1)}>+</Button>
+                <Button onClick={() => setMinute(min - 1)}>-</Button>
+                <Button onClick={() => setMinute(15)}>15min</Button>
+                <Button onClick={() => setMinute(30)}>30min</Button>
+                <Button onClick={() => setMinute(45)}>45min</Button>
+                <Button onClick={go} className="primary">{isRunning ? 'Stop':'Start'}</Button>
+                <Button onClick={reset}>Reset</Button>
+                <Button onClick={() => {
+                    reset();
+                    setQuarter(quarter + 1)
+                }}>Quarter</Button>
+                <Button onClick={onSave}>Save</Button>
+            </div>
         </>
     );
 };

@@ -17,7 +17,7 @@ const TeamName = ({ name = "Home" }: TeamNameProps) => {
 
     return (
         <span
-            className="text-xl cursor-pointer"
+            className="text-[5rem] cursor-pointer text-center text-green-500"
             onClick={onClick}>
             {teamName}
         </span>
